@@ -4,6 +4,7 @@ let UserStr = [];
 
 let encriptStr = [];
 let sendStr = [];
+let colors = [];
 let maxDistance;
 let spacer;
 let SqSize;
@@ -35,6 +36,7 @@ function setup() {
    row=0;
    column=0;
    frameRate(14);
+   colors = ["red",  "yellow", "orange","Cyan","Purple","blue", "green","gray"];
 
 	inputKeywordBox();
 	//UserStr = 'The quick brown fox jumped over the lazy dog';
@@ -53,7 +55,22 @@ function draw() {
 	// 	inputSentenceBox();
 	// 	displayInputBox = false;
 	// }
-	if(state == 'encrypt'){
+	if(state == 'DrawKeyword'){
+		
+		if(StrIndex<KeyWord.length)
+			drawKeyword (KeyWord);
+		else
+		{
+			row=0;
+			column=0;
+			StrIndex=0;
+			inputSentenceBox();
+			noLoop();
+		}
+
+
+	}
+	else if(state == 'encrypt'){
 		if(UserStr.length > 0){
 		if(StrIndex<UserStr.length)
 			drawOrigin(UserStr);
@@ -128,21 +145,32 @@ function decriptMessage (data) {
 		loop();
 }
 		
+function drawKeyword (stringToDraw) {
 
+	column = DrawIndex%KeyLen;
+	
+	 fill(colors[column]);	  
+	 rect(Xstart, Ystart, SqSize, SqSize);
+	 fill(50);
+	 textSize(SqSize);
+	 textAlign(CENTER, CENTER);
+	 let currChar = stringToDraw[StrIndex];
+	 if(currChar != ' ')
+	 {
+	   text(currChar, Xstart, Ystart+(SqSize/2),SqSize); // Text wraps within text box
+	   StrIndex++;
+	   DrawIndex++;
+	   Xstart+=SqSize;
+	 }
+
+	// return;
+}
 	  
 function drawOrigin (stringToDraw) {
 
 	 column = DrawIndex%KeyLen;
-	  if(column == 0)
-		fill(255,200,200);
-	  else if(column == 1)
-		  fill(200,100,0);
-	  else if(column == 2)
-		  fill(150,25,10);
-	  else if(column == 3)
-		  fill(255,0,0);
-	  else 
-		  fill(0,0,255);
+	 
+	  fill(colors[column]);	  
 	  rect(Xstart, Ystart, SqSize, SqSize);
 	  fill(50);
 	  textSize(SqSize);
@@ -219,9 +247,8 @@ function sortKeyWord () {
 
 }
 function inputKeywordBox () {
-	state= 'encrypt';
-	Xstart = SqSize;
-	Ystart = SqSize;
+	
+	
     input = createInput();
   	input.position(Xstart + 6*SqSize, Ystart);
  	button = createButton('submit');
@@ -236,11 +263,18 @@ function getKeyword () {
 	KeyWord = KeyWord.toUpperCase();
 	KeyLen = KeyWord.length;
 	socket.emit('KeyWord',KeyWord);
-	inputSentenceBox();
+	Xstart = SqSize;
+	Ystart = SqSize-4;
+   	row=0;
+	column=0;
+	StrIndex=0;
+	state= 'DrawKeyword';
+	loop();
+	//inputSentenceBox();
 }
 function inputSentenceBox () {
 	Xstart = SqSize;
-	Ystart = SqSize;
+	Ystart = 2*SqSize;
   	input = createInput();
   	input.position(Xstart + 6*SqSize, Ystart + 3*SqSize);
  	button = createButton('submit');
@@ -256,7 +290,8 @@ function getSentece () {
 		encriptStr[x] = []; // create nested array
 		for (let y = 0; y <Math.ceil(UserStr.length/KeyLen); y++) 
 			encriptStr[x][y] = "";
-    }
+	}
+	state= 'encrypt';
     loop();
 	
 }
