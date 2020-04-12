@@ -202,33 +202,65 @@ function drawEncryptedOrdered () {
 		
 		Ystart += 2*SqSize;
 		let xx=0;
+		
 		for(let k=0;k<KeyLen ;k++)
 		{
 			encriptStr[orderOfletters[k]] = encriptStr[orderOfletters[k]].join("");
 			Ystart += SqSize;
 			textAlign(LEFT);
+			fill(colors[orderOfletters[k]]);	
 			text( encriptStr[orderOfletters[k]], Xstart, Ystart+(SqSize/2),SqSize);
+		
 			for(let y=0 ; y < encriptStr[k].length ; y++)
 			{
 				sendStr[xx]= encriptStr[orderOfletters[k]][y];
+				
 				xx++;
-			}		
+			}
+			
+						
+					
 		}
-	
+
 		Xstart = SqSize;
 		textSize(SqSize/2);
 		sendStr = sendStr.join("");
 		Ystart += SqSize;
 		textAlign(LEFT);
+		
 		text( sendStr, Xstart, Ystart+(SqSize/2));
 		StrIndex=0;
 		DrawIndex=0;
 		row=0;
 		column=0;
+		drawKeywordNum();
 		socket.emit('encriptedMassage',sendStr);
 		noLoop();
 	  
 }
+
+
+function drawKeywordNum () {
+
+	column = DrawIndex%KeyLen;
+	
+	// fill(colors[column]);	  
+	// rect(Xstart, Ystart, SqSize, SqSize);
+	Xstart = SqSize;
+	Ystart = SqSize-(SqSize/4);
+	fill("white");
+    textSize(SqSize/2);
+    textAlign(RIGHT, TOP);
+    for(let k=0;k<KeyLen ;k++)
+	{
+		let currChar = k+1;
+		text(currChar, Xstart+(orderOfletters[k]*SqSize), Ystart+(SqSize/2),SqSize); // Text wraps within text box
+		//Xstart+=SqSize;
+	}
+
+	// return;
+}
+
 function sortKeyWord () {
 	orderOfletters = new Array(KeyLen);
 	var k=0;
@@ -246,9 +278,7 @@ function sortKeyWord () {
 	}
 
 }
-function inputKeywordBox () {
-	
-	
+function inputKeywordBox () {	
     input = createInput();
   	input.position(Xstart + 6*SqSize, Ystart);
  	button = createButton('submit');
@@ -264,7 +294,7 @@ function getKeyword () {
 	KeyLen = KeyWord.length;
 	socket.emit('KeyWord',KeyWord);
 	Xstart = SqSize;
-	Ystart = SqSize-4;
+	Ystart = SqSize-(SqSize/4);
    	row=0;
 	column=0;
 	StrIndex=0;
