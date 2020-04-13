@@ -2,7 +2,8 @@
 
 let UserStr = [];
 
-let encriptStr = [];
+let encryptStr = [];
+let decryptStr = [];
 let sendStr = [];
 let colors = [];
 let maxDistance;
@@ -64,6 +65,8 @@ function draw() {
 			row=0;
 			column=0;
 			StrIndex=0;
+			sortKeyWord();
+			drawKeywordNum();
 			inputSentenceBox();
 			noLoop();
 		}
@@ -83,17 +86,18 @@ function draw() {
 		  }
 		  else
 		  {
-		  	sortKeyWord();
-		  	drawEncryptedOrdered();
+		   	drawEncryptedOrdered();
 		  	noLoop();
 		  }
 		}
 		}
 	}
 	else if(state == 'decrypt'){
+
+		
 		if(recivedStr.length > 0){
 			if(StrIndex<recivedStr.length)
-				drawOrigin(recivedStr);
+				drawDecrypt(recivedStr);
 			else
 			{
 			
@@ -103,8 +107,8 @@ function draw() {
 			  }
 			  else
 			  {
-			  	sortKeyWord();
-			  	drawEncryptedOrdered();
+				 
+			  	//drawEncryptedOrdered();
 			  	noLoop();
 			  }
 			}
@@ -121,6 +125,13 @@ function draw() {
 function updateKeyWord(data) {
  	KeyWord = data;
 	KeyLen = KeyWord.length;
+	Xstart = SqSize;
+	Ystart = SqSize-(SqSize/4);
+   	row=0;
+	column=0;
+	StrIndex=0;
+	state = 'DrawKeyword';
+	loop();
  } 
 function decriptMessage (data) {
 		recivedStr = data;
@@ -134,14 +145,14 @@ function decriptMessage (data) {
 		//KeyWord = 'mango';
 		//KeyLen = KeyWord.length;
 		Xstart = SqSize;
-		Ystart = SqSize;
+		Ystart = SqSize*2;
 		row=0;
 		state = 'decrypt';
 		for (let x = 0; x < KeyLen; x++) {
-		encriptStr[x] = []; // create nested array
-		for (let y = 0; y <Math.ceil(recivedStr.length/KeyLen); y++) 
-			encriptStr[x][y] = "";
-    }
+			decryptStr[x] = []; // create nested array
+			for (let y = 0; y <Math.ceil(recivedStr.length/KeyLen); y++) 
+				decryptStr[x][y] = "";
+    	}
 		loop();
 }
 		
@@ -180,7 +191,7 @@ function drawOrigin (stringToDraw) {
 	  {
        
 		text(currChar, Xstart, Ystart+(SqSize/2),SqSize); // Text wraps within text box
-		encriptStr[column][row]=currChar;
+		encryptStr[column][row]=currChar;
 
 		  StrIndex++;
 		  DrawIndex++;
@@ -198,6 +209,38 @@ function drawOrigin (stringToDraw) {
 	 // return;
 }
 
+
+function drawDecrypt (stringToDraw) {
+
+	//column = DrawIndex%KeyLen;
+	let columnLen = stringToDraw.length/KeyLen;
+	let col =  Math.ceil(DrawIndex/columnLen)
+	column = orderOfletters[col];
+	 fill(colors[column]);	  
+	 rect(Xstart+(SqSize*column), Ystart, SqSize, SqSize);
+	 fill(50);
+	 textSize(SqSize);
+	 textAlign(CENTER, CENTER);
+	 let currChar = stringToDraw[StrIndex];
+	 
+	  
+	text(currChar, Xstart+(SqSize*column), Ystart,SqSize); // Text wraps within text box
+//	decryptStr[column][row]=currChar;
+
+	StrIndex++;
+	DrawIndex++;
+	Ystart+=SqSize;
+	if(DrawIndex%columnLen==0)
+	{
+		
+		Ystart = 2*SqSize;
+		
+	}
+	
+
+	// return;
+}
+
 function drawEncryptedOrdered () {
 		
 		Ystart += 2*SqSize;
@@ -205,15 +248,15 @@ function drawEncryptedOrdered () {
 		
 		for(let k=0;k<KeyLen ;k++)
 		{
-			encriptStr[orderOfletters[k]] = encriptStr[orderOfletters[k]].join("");
+			encryptStr[orderOfletters[k]] = encryptStr[orderOfletters[k]].join("");
 			Ystart += SqSize;
 			textAlign(LEFT);
 			fill(colors[orderOfletters[k]]);	
-			text( encriptStr[orderOfletters[k]], Xstart, Ystart+(SqSize/2),SqSize);
+			text( encryptStr[orderOfletters[k]], Xstart, Ystart+(SqSize/2),SqSize);
 		
-			for(let y=0 ; y < encriptStr[k].length ; y++)
+			for(let y=0 ; y < encryptStr[k].length ; y++)
 			{
-				sendStr[xx]= encriptStr[orderOfletters[k]][y];
+				sendStr[xx]= encryptStr[orderOfletters[k]][y];
 				
 				xx++;
 			}
@@ -317,9 +360,9 @@ function inputSentenceBox () {
 function getSentece () {
 	UserStr = input.value();
 	for (let x = 0; x < KeyLen; x++) {
-		encriptStr[x] = []; // create nested array
+		encryptStr[x] = []; // create nested array
 		for (let y = 0; y <Math.ceil(UserStr.length/KeyLen); y++) 
-			encriptStr[x][y] = "";
+			encryptStr[x][y] = "";
 	}
 	state= 'encrypt';
     loop();
