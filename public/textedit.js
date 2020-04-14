@@ -394,8 +394,7 @@ function inputSentenceDropDownBox() {
   
   function SelectEvent() {
 	UserStr =  sel.value();
-	UserStr= trim(UserStr);
-	UserStr = UserStr.replace(/\s/g, ''); // remove all spaces in user guess string 
+	
 	processUserStr();
   }
 
@@ -418,6 +417,8 @@ function inputSentenceDropDownBox() {
   }
   else
   {
+	  UserStr= trim(UserStr);
+	  UserStr = UserStr.replace(/\s/g, ''); // remove all spaces in user guess string 
 	  state = 'decrypt';
 	  loop();
   }
