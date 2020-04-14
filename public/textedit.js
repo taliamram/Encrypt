@@ -91,7 +91,12 @@ function draw() {
 		
 		  if(column != KeyLen-1)
 		  {
-		    StrIndex = StrIndex-(KeyLen-column-1);
+		   // StrIndex = StrIndex-(KeyLen-column-1);
+		   let l = 'z'.charCodeAt(0) - (KeyLen-1-column);
+		   for(i=0;i<KeyLen-1-column;i++)
+		   {
+			   UserStr += String.fromCharCode(l+i+1);
+		   }
 		  }
 		  else
 		  {
@@ -197,14 +202,14 @@ function drawOrigin (stringToDraw) {
 	 column = DrawIndex%KeyLen;
 	 
 	  fill(colors[column]);	  
-	  rect(Xstart, Ystart, SqSize, SqSize);
-	  fill(50);
-	  textSize(SqSize);
-	  textAlign(CENTER, CENTER);
+	  
 	  let currChar = stringToDraw[StrIndex];
 	  if(currChar != ' ')
 	  {
-       
+		rect(Xstart, Ystart, SqSize, SqSize);
+		fill(50);
+		textSize(SqSize);
+		textAlign(CENTER, CENTER);
 		text(currChar, Xstart, Ystart+(SqSize/2),SqSize); // Text wraps within text box
 		encryptStr[column][row]=currChar;
 
@@ -219,7 +224,9 @@ function drawOrigin (stringToDraw) {
 		  }
 	  }
 	  else
-		  StrIndex++;
+	  {
+		StrIndex++;
+	  }
 
 	 // return;
 }
