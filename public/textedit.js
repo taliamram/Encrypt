@@ -114,19 +114,10 @@ function draw() {
 				drawDecrypt(recivedStr);
 			else
 			{
-			
-			  if(column != KeyLen-1)
-			  {
-			    StrIndex = StrIndex-(KeyLen-column-1);
-			  }
-			  else
-			  {
 				decryptStr = decryptStr.join("");
 				textAlign(LEFT);
 				text("the message is: " + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
-			  	//drawEncryptedOrdered();
 			  	noLoop();
-			  }
 			}
 		}
 	}
@@ -236,8 +227,11 @@ function drawDecrypt (stringToDraw) {
 	
 	//column = DrawIndex%KeyLen;
 	columnLen = stringToDraw.length/KeyLen;
-	let col =  Math.floor(DrawIndex/columnLen);
+	let col =  Math.floor(StrIndex/columnLen);
+	if(col >= KeyLen)
+	   console.log(stringToDraw);
 	column = orderOfletters[col];
+	
 	fill(colors[column]);	  
 	rect(Xstart+(SqSize*column), Ystart, SqSize, SqSize);
 	fill(50);
@@ -250,10 +244,10 @@ function drawDecrypt (stringToDraw) {
 	//decryptStr[row++][column]=currChar;
 	//console.log(decryptStr);
 	StrIndex++;
-	DrawIndex++;
+	//DrawIndex++;
 	Ystart+=SqSize;
 	row++;
-	if(DrawIndex%columnLen==0)
+	if(StrIndex%columnLen==0)
 	{
 		row=0;
 		Ystart = 2*SqSize;
