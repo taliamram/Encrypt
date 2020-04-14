@@ -23,13 +23,20 @@ let inputCompleted;
 let state;
 let recivedStr;
 let columnLen;
+let  buttonKeyWord;
+let greetingKeyWord;
+let inputKeyWord;
+let buttonMessage;
+let greetingMessage;
+let inputMessage;
+
 function setup() {
 	inputCompleted = false;
 	
 	createCanvas(window.innerWidth, window.innerHeight);//(windowWidth, windowHeight);
 	
 	socket = io.connect('http://127.0.0.1:3000');
-	socket.on('encriptedMassage',decriptMessage);
+	socket.on('encriptedMessage',decriptMessage);
 	socket.on('KeyWord',updateKeyWord);
 	stroke(20);      
 	SqSize = windowHeight/20;
@@ -37,6 +44,7 @@ function setup() {
 	Ystart = SqSize;
    row=0;
    column=0;
+   state = 'nostate';
    frameRate(14);
    colors = ["red",  "yellow", "orange","Cyan","Purple","blue", "green","gray"];
 
@@ -110,7 +118,7 @@ function draw() {
 			  {
 				decryptStr = decryptStr.join("");
 				textAlign(LEFT);
-				text("the massage is: " + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
+				text("the message is: " + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
 			  	//drawEncryptedOrdered();
 			  	noLoop();
 			  }
@@ -133,6 +141,10 @@ function updateKeyWord(data) {
    	row=0;
 	column=0;
 	StrIndex=0;
+	buttonKeyWord.hide();
+	greetingKeyWord.remove();
+	inputKeyWord.remove();
+	background("pink"); // Set the background to white
 	state = 'DrawKeyword';
 	loop();
  } 
@@ -150,12 +162,12 @@ function decriptMessage (data) {
 		Xstart = SqSize;
 		Ystart = SqSize*2;
 		row=0;
+		buttonMessage.hide();
+		greetingMessage.remove();
+		inputMessage.remove();
+
+		
 		state = 'decrypt';
-	//	for (let x = 0; x < KeyLen; x++) {
-	//		decryptStr[x] = []; // create nested array
-	//		for (let y = 0; y <Math.ceil(recivedStr.length/KeyLen); y++) 
-	//			decryptStr[x][y] = "";
-    //	}
 		loop();
 }
 		
@@ -281,7 +293,7 @@ function drawEncryptedOrdered () {
 		row=0;
 		column=0;
 		drawKeywordNum();
-		socket.emit('encriptedMassage',sendStr);
+		socket.emit('encriptedMessage',sendStr);
 		noLoop();
 	  
 }
@@ -326,50 +338,66 @@ function sortKeyWord () {
 
 }
 function inputKeywordBox () {	
-    input = createInput();
-  	input.position(Xstart + 6*SqSize, Ystart);
- 	button = createButton('submit');
-  	button.position(input.x + input.width, Ystart);
-  	greeting = createElement('h2', 'Enter your keyword:');
-  	greeting.position(input.x, input.y-50);
-  	button.mousePressed(getKeyword);
+	inputKeyWord = createInput();
+	inputKeyWord.size(60);
+	inputKeyWord.position(Xstart + 6*SqSize, Ystart);
+	buttonKeyWord = createButton('submit');
+  	buttonKeyWord.position(inputKeyWord.x + inputKeyWord.width, Ystart);
+  	greetingKeyWord = createElement('h2', 'Enter your keyword:');
+  	greetingKeyWord.position(inputKeyWord.x, inputKeyWord.y-50);
+  	buttonKeyWord.mousePressed(getKeyword);
 }
 
 function getKeyword () {
-	KeyWord = input.value();
+	KeyWord = inputKeyWord.value();
 	KeyWord = KeyWord.toUpperCase();
 	KeyLen = KeyWord.length;
-	socket.emit('KeyWord',KeyWord);
-	Xstart = SqSize;
-	Ystart = SqSize-(SqSize/4);
-   	row=0;
-	column=0;
-	StrIndex=0;
-	state= 'DrawKeyword';
-	loop();
+	if(KeyLen > 2)
+	{
+		buttonKeyWord.hide();
+		greetingKeyWord.remove();
+		inputKeyWord.remove();
+		socket.emit('KeyWord',KeyWord);
+		Xstart = SqSize;
+		Ystart = SqSize-(SqSize/4);
+		row=0;
+		column=0;
+		StrIndex=0;
+		background("Green"); // Set the background to 
+		state= 'DrawKeyword';
+		loop();
+	}
 	//inputSentenceBox();
 }
 function inputSentenceBox () {
 	Xstart = SqSize;
 	Ystart = 2*SqSize;
-  	input = createInput();
-  	input.position(Xstart + 6*SqSize, Ystart + 3*SqSize);
- 	button = createButton('submit');
-  	button.position(input.x + input.width, input.y);
-  	greeting = createElement('h2', 'Now enter the sentence you want to encrypt:');
-  	greeting.position(input.x, input.y-50);
-	button.mousePressed(getSentece);
+	inputMessage = createInput();
+	inputMessage.size(300);
+	inputMessage.position(Xstart + 6*SqSize, Ystart + 3*SqSize);
+	inputMessage.size = 400;
+ 	buttonMessage = createButton('submit');
+	 buttonMessage.position(inputMessage.x + inputMessage.width, inputMessage.y);
+	 greetingMessage = createElement('h2', 'Now enter the sentence you want to encrypt:');
+	 greetingMessage.position(inputMessage.x, inputMessage.y-50);
+	buttonMessage.mousePressed(getSentece);
    
 }
 function getSentece () {
-	UserStr = input.value();
-	for (let x = 0; x < KeyLen; x++) {
-		encryptStr[x] = []; // create nested array
-		for (let y = 0; y <Math.ceil(UserStr.length/KeyLen); y++) 
-			encryptStr[x][y] = "";
-	}
-	state= 'encrypt';
-    loop();
+	UserStr = inputMessage.value();
+	if(UserStr.length > 2)
+	{
+		buttonMessage.hide();
+		greetingMessage.remove();
+		//inputMessage.remove(); // we want not remove that 
+		for (let x = 0; x < KeyLen; x++) {
+			encryptStr[x] = []; // create nested array
+			for (let y = 0; y <Math.ceil(UserStr.length/KeyLen); y++) 
+				encryptStr[x][y] = "";
+		}
+		state= 'encrypt';
+		loop();
+    }
 	
 }
 

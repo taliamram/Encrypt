@@ -19,12 +19,12 @@ function newTaliConnection (socket) {
 
  socket.on('mouse-out', mouseMsg);
 
-socket.on('encriptedMassage', stringMsg);
+socket.on('encriptedMessage', stringMsg);
 socket.on('KeyWord', updateKeyWord);
 
 
 function stringMsg (data) {
-	socket.broadcast.emit('encriptedMassage',data);
+	socket.broadcast.emit('encriptedMessage',data);
 	console.log(data);
 }
 
