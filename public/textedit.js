@@ -22,6 +22,7 @@ let displayInputBox;
 let inputCompleted;
 let state;
 let recivedStr;
+let columnLen;
 function setup() {
 	inputCompleted = false;
 	
@@ -107,7 +108,9 @@ function draw() {
 			  }
 			  else
 			  {
-				 
+				decryptStr = decryptStr.join("");
+				textAlign(LEFT);
+				text("the massage is: " + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
 			  	//drawEncryptedOrdered();
 			  	noLoop();
 			  }
@@ -139,7 +142,7 @@ function decriptMessage (data) {
 		Ystart = SqSize*5;
 		textSize(SqSize/2);
 		textAlign(LEFT);
-		text( "Got an encrypted message! \n"+ recivedStr, Xstart + windowWidth/2, Ystart+(SqSize/2));
+		//text( "Got an encrypted message! \n"+ recivedStr, Xstart + windowWidth/2, Ystart+(SqSize/2));
 		StrIndex=0;
 		DrawIndex=0;
 		//KeyWord = 'mango';
@@ -148,11 +151,11 @@ function decriptMessage (data) {
 		Ystart = SqSize*2;
 		row=0;
 		state = 'decrypt';
-		for (let x = 0; x < KeyLen; x++) {
-			decryptStr[x] = []; // create nested array
-			for (let y = 0; y <Math.ceil(recivedStr.length/KeyLen); y++) 
-				decryptStr[x][y] = "";
-    	}
+	//	for (let x = 0; x < KeyLen; x++) {
+	//		decryptStr[x] = []; // create nested array
+	//		for (let y = 0; y <Math.ceil(recivedStr.length/KeyLen); y++) 
+	//			decryptStr[x][y] = "";
+    //	}
 		loop();
 }
 		
@@ -211,28 +214,29 @@ function drawOrigin (stringToDraw) {
 
 
 function drawDecrypt (stringToDraw) {
-
+	
 	//column = DrawIndex%KeyLen;
-	let columnLen = stringToDraw.length/KeyLen;
-	let col =  Math.ceil(DrawIndex/columnLen)
+	columnLen = stringToDraw.length/KeyLen;
+	let col =  Math.floor(DrawIndex/columnLen);
 	column = orderOfletters[col];
-	 fill(colors[column]);	  
-	 rect(Xstart+(SqSize*column), Ystart, SqSize, SqSize);
-	 fill(50);
-	 textSize(SqSize);
-	 textAlign(CENTER, CENTER);
-	 let currChar = stringToDraw[StrIndex];
-	 
-	  
+	fill(colors[column]);	  
+	rect(Xstart+(SqSize*column), Ystart, SqSize, SqSize);
+	fill(50);
+	textSize(SqSize);
+	textAlign(LEFT, LEFT);
+	//textAlign(CENTER, CENTER);
+	let currChar = stringToDraw[StrIndex]; 
 	text(currChar, Xstart+(SqSize*column), Ystart,SqSize); // Text wraps within text box
-//	decryptStr[column][row]=currChar;
-
+	decryptStr[column+(row*KeyLen)]=currChar;
+	//decryptStr[row++][column]=currChar;
+	//console.log(decryptStr);
 	StrIndex++;
 	DrawIndex++;
 	Ystart+=SqSize;
+	row++;
 	if(DrawIndex%columnLen==0)
 	{
-		
+		row=0;
 		Ystart = 2*SqSize;
 		
 	}
