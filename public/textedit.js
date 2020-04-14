@@ -29,6 +29,8 @@ let inputKeyWord;
 let buttonMessage;
 let greetingMessage;
 let inputMessage;
+let sel;
+let isreceiver;
 
 function setup() {
 	inputCompleted = false;
@@ -42,16 +44,14 @@ function setup() {
 	SqSize = windowHeight/20;
 	Xstart = SqSize;
 	Ystart = SqSize;
+	isreceiver = false;
    row=0;
    column=0;
    state = 'nostate';
    frameRate(14);
    colors = ["red",  "yellow", "orange","Cyan","Purple","blue", "green","gray"];
-
 	inputKeywordBox();
-	//UserStr = 'The quick brown fox jumped over the lazy dog';
   	noLoop();
-
 }
 
 function windowResized() {
@@ -60,11 +60,6 @@ function windowResized() {
 }
 
 function draw() {
-	// if(displayInputBox){
-	// 	inputKeywordBox();
-	// 	inputSentenceBox();
-	// 	displayInputBox = false;
-	// }
 	if(state == 'DrawKeyword'){
 		
 		if(StrIndex<KeyWord.length)
@@ -79,8 +74,6 @@ function draw() {
 			inputSentenceBox();
 			noLoop();
 		}
-
-
 	}
 	else if(state == 'encrypt'){
 		if(UserStr.length > 0){
@@ -107,8 +100,6 @@ function draw() {
 		}
 	}
 	else if(state == 'decrypt'){
-
-		
 		if(recivedStr.length > 0){
 			if(StrIndex<recivedStr.length)
 				drawDecrypt(recivedStr);
@@ -116,7 +107,8 @@ function draw() {
 			{
 				decryptStr = decryptStr.join("");
 				textAlign(LEFT);
-				text("the message is: " + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
+				textSize(SqSize/2);
+				text("the message is: \n" + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
 			  	noLoop();
 			}
 		}
@@ -124,9 +116,6 @@ function draw() {
 	else{
 		noLoop();
 	}
-	
-	
-
 }
  
 function updateKeyWord(data) {
@@ -146,31 +135,28 @@ function updateKeyWord(data) {
  } 
 function decriptMessage (data) {
 		recivedStr = data;
-        Xstart = SqSize*6;
-		Ystart = SqSize*5;
-		textSize(SqSize/2);
-		textAlign(LEFT);
-		//text( "Got an encrypted message! \n"+ recivedStr, Xstart + windowWidth/2, Ystart+(SqSize/2));
-		StrIndex=0;
-		DrawIndex=0;
-		//KeyWord = 'mango';
-		//KeyLen = KeyWord.length;
 		Xstart = SqSize;
 		Ystart = SqSize*2;
-		row=0;
-		buttonMessage.hide();
+		textSize(SqSize/2);
+		textAlign(LEFT);
 		greetingMessage.remove();
-		inputMessage.remove();
-
-		
-		state = 'decrypt';
-		loop();
+		text("got encrypted message :" + data, Xstart, Ystart); // Text wraps within text box
+		StrIndex=0;
+		DrawIndex=0;
+		Xstart = SqSize;
+		Ystart = SqSize*4;
+		row=0;
+		isreceiver = true;
+		//buttonMessage.hide();
+		greetingMessage.remove();
+		//inputMessage.remove();
+		//sel.remove();
+		//state = 'decrypt';
+		//loop();
 }
 		
 function drawKeyword (stringToDraw) {
-
 	column = DrawIndex%KeyLen;
-	
 	 fill(colors[column]);	  
 	 rect(Xstart, Ystart, SqSize, SqSize);
 	 fill(50);
@@ -184,8 +170,6 @@ function drawKeyword (stringToDraw) {
 	   DrawIndex++;
 	   Xstart+=SqSize;
 	 }
-
-	// return;
 }
 	  
 function drawOrigin (stringToDraw) {
@@ -203,23 +187,20 @@ function drawOrigin (stringToDraw) {
 		textAlign(CENTER, CENTER);
 		text(currChar, Xstart, Ystart+(SqSize/2),SqSize); // Text wraps within text box
 		encryptStr[column][row]=currChar;
-
-		  StrIndex++;
-		  DrawIndex++;
-		  Xstart+=SqSize;
-		  if(DrawIndex%KeyLen==0)
-		  {
-			  Xstart = SqSize;
-			  Ystart += SqSize;
-			  row++;
-		  }
+		StrIndex++;
+		DrawIndex++;
+		Xstart+=SqSize;
+		if(DrawIndex%KeyLen==0)
+		{
+		  Xstart = SqSize;
+		  Ystart += SqSize;
+		  row++;
+		}
 	  }
 	  else
 	  {
 		StrIndex++;
 	  }
-
-	 // return;
 }
 
 
@@ -231,7 +212,6 @@ function drawDecrypt (stringToDraw) {
 	if(col >= KeyLen)
 	   console.log(stringToDraw);
 	column = orderOfletters[col];
-	
 	fill(colors[column]);	  
 	rect(Xstart+(SqSize*column), Ystart, SqSize, SqSize);
 	fill(50);
@@ -241,71 +221,54 @@ function drawDecrypt (stringToDraw) {
 	let currChar = stringToDraw[StrIndex]; 
 	text(currChar, Xstart+(SqSize*column), Ystart,SqSize); // Text wraps within text box
 	decryptStr[column+(row*KeyLen)]=currChar;
-	//decryptStr[row++][column]=currChar;
-	//console.log(decryptStr);
 	StrIndex++;
-	//DrawIndex++;
 	Ystart+=SqSize;
 	row++;
 	if(StrIndex%columnLen==0)
 	{
 		row=0;
-		Ystart = 2*SqSize;
+		Ystart = 4*SqSize;
 		
 	}
-	
-
-	// return;
 }
 
 function drawEncryptedOrdered () {
-		
-		Ystart += 2*SqSize;
+
+		//Ystart += SqSize;
 		let xx=0;
-		
+		textSize(SqSize/2);
 		for(let k=0;k<KeyLen ;k++)
 		{
 			encryptStr[orderOfletters[k]] = encryptStr[orderOfletters[k]].join("");
-			Ystart += SqSize;
+			Ystart += SqSize/2;
 			textAlign(LEFT);
 			fill(colors[orderOfletters[k]]);	
 			text( encryptStr[orderOfletters[k]], Xstart, Ystart+(SqSize/2),SqSize);
-		
 			for(let y=0 ; y < encryptStr[k].length ; y++)
 			{
 				sendStr[xx]= encryptStr[orderOfletters[k]][y];
-				
 				xx++;
 			}
-			
-						
-					
 		}
-
 		Xstart = SqSize;
 		textSize(SqSize/2);
 		sendStr = sendStr.join("");
 		Ystart += SqSize;
 		textAlign(LEFT);
-		
 		text( sendStr, Xstart, Ystart+(SqSize/2));
 		StrIndex=0;
 		DrawIndex=0;
 		row=0;
 		column=0;
 		drawKeywordNum();
+		isreceiver = false;
 		socket.emit('encriptedMessage',sendStr);
 		noLoop();
-	  
 }
 
 
 function drawKeywordNum () {
-
 	column = DrawIndex%KeyLen;
-	
-	// fill(colors[column]);	  
-	// rect(Xstart, Ystart, SqSize, SqSize);
 	Xstart = SqSize;
 	Ystart = SqSize-(SqSize/4);
 	fill("white");
@@ -315,10 +278,7 @@ function drawKeywordNum () {
 	{
 		let currChar = k+1;
 		text(currChar, Xstart+(orderOfletters[k]*SqSize), Ystart+(SqSize/2),SqSize); // Text wraps within text box
-		//Xstart+=SqSize;
 	}
-
-	// return;
 }
 
 function sortKeyWord () {
@@ -336,12 +296,12 @@ function sortKeyWord () {
 			}
 		}
 	}
-
 }
+
 function inputKeywordBox () {	
 	inputKeyWord = createInput();
 	inputKeyWord.size(60);
-	inputKeyWord.position(Xstart + 6*SqSize, Ystart);
+	inputKeyWord.position(Xstart , Ystart);
 	buttonKeyWord = createButton('submit');
   	buttonKeyWord.position(inputKeyWord.x + inputKeyWord.width, Ystart);
   	greetingKeyWord = createElement('h2', 'Enter your keyword:');
@@ -368,40 +328,68 @@ function getKeyword () {
 		state= 'DrawKeyword';
 		loop();
 	}
-	//inputSentenceBox();
 }
 function inputSentenceBox () {
 	Xstart = SqSize;
-	Ystart = 2*SqSize;
+	Ystart = 2.5*SqSize;
 	inputMessage = createInput();
 	inputMessage.size(300);
-	inputMessage.position(Xstart + 6*SqSize, Ystart + 3*SqSize);
+	inputMessage.position(Xstart , Ystart);
 	inputMessage.size = 400;
  	buttonMessage = createButton('submit');
-	 buttonMessage.position(inputMessage.x + inputMessage.width, inputMessage.y);
-	 greetingMessage = createElement('h2', 'Now enter the sentence you want to encrypt:');
-	 greetingMessage.position(inputMessage.x, inputMessage.y-50);
+	buttonMessage.position(inputMessage.x + inputMessage.width, inputMessage.y);
+	greetingMessage = createElement('h2', 'enter sentence to encrypt');
+	greetingMessage.position(inputMessage.x, inputMessage.y-50);
 	buttonMessage.mousePressed(getSentece);
-   
+	inputSentenceDropDownBox();
 }
+
 function getSentece () {
 	UserStr = inputMessage.value();
+	processUserStr();
+}
+
+
+function inputSentenceDropDownBox() {
+	textAlign(CENTER);
+	Xstart = SqSize;
+	sel = createSelect();
+	sel.position(Xstart , Ystart+(SqSize/2));
+	sel.option("-----------------or select one from below ---------------------");
+	sel.option("Nothing shows a man's character more than what he laughs at");
+	sel.option("Life is like a mirror we get the best results when we smile at it");
+	sel.option("If you want happiness for a lifetime help someone else");
+	sel.option("The world is full of beautiful things including you");
+	sel.option("i'm on a seafood diet i see food and i eat it");
+	sel.option("My candle burns at both ends");
+	sel.changed(SelectEvent);
+  }
+  
+  function SelectEvent() {
+	UserStr =  sel.value();
+	processUserStr();
+  }
+
+  function processUserStr() {
+  if(isreceiver == false)  
+  {
 	if(UserStr.length > 2)
 	{
 		buttonMessage.hide();
 		greetingMessage.remove();
-		//inputMessage.remove(); // we want not remove that 
 		for (let x = 0; x < KeyLen; x++) {
 			encryptStr[x] = []; // create nested array
 			for (let y = 0; y <Math.ceil(UserStr.length/KeyLen); y++) 
 				encryptStr[x][y] = "";
 		}
+		Ystart = 3.5*SqSize;
 		state= 'encrypt';
 		loop();
-    }
-	
+	}
+  }
+  else
+  {
+	  state = 'decrypt';
+	  loop();
+  }
 }
-
-
-
-
