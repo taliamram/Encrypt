@@ -28,6 +28,7 @@ let greetingKeyWord;
 let inputKeyWord;
 let buttonMessage;
 let greetingMessage;
+let greetingError;
 let inputMessage;
 let sel;
 let isreceiver;
@@ -108,7 +109,19 @@ function draw() {
 				decryptStr = decryptStr.join("");
 				textAlign(LEFT);
 				textSize(SqSize/2);
+				
 				text("the message is: \n" + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
+				if(decryptStr.includes(UserStr) == true)
+				{
+					fill("green");
+					text("VERY GOOD !!! your guess was correct \n",windowWidth/2, windowHeight/2,SqSize); 
+				}
+				else
+				{
+					fill("red");
+					text(" :( bad guess \n",windowWidth/2, windowHeight/2,SqSize);
+				}
+
 			  	noLoop();
 			}
 		}
@@ -310,25 +323,38 @@ function inputKeywordBox () {
 }
 
 function getKeyword () {
+	if(greetingError)
+    	greetingError.remove();	
 	KeyWord = inputKeyWord.value();
-	KeyWord = KeyWord.toUpperCase();
+	KeyWord = trim(KeyWord); // remove space from begining and end of string
+	KeyWord = KeyWord.toUpperCase(); // make all chat uper case - Big letters
 	KeyLen = KeyWord.length;
-	if(KeyLen > 2)
+	if(KeyWord.match("^[a-zA-Z]*$")) // make sure that oly alpha beit is inserted 
 	{
-		buttonKeyWord.hide();
-		greetingKeyWord.remove();
-		inputKeyWord.remove();
-		socket.emit('KeyWord',KeyWord);
-		Xstart = SqSize;
-		Ystart = SqSize-(SqSize/4);
-		row=0;
-		column=0;
-		StrIndex=0;
-		background("Green"); // Set the background to 
-		state= 'DrawKeyword';
-		loop();
+		if(KeyLen > 2 && KeyLen <=7 )
+		{
+			buttonKeyWord.hide();
+			greetingKeyWord.remove();
+			inputKeyWord.remove();
+			socket.emit('KeyWord',KeyWord);
+			Xstart = SqSize;
+			Ystart = SqSize-(SqSize/4);
+			row=0;
+			column=0;
+			StrIndex=0;
+			background("Green"); // Set the background to 
+			state= 'DrawKeyword';
+			loop();
+		}
+		
+	}
+	else
+	{ 
+		greetingError = createElement('h2', 'keyword can be only A-Z a-z and 3-7 length');
+		greetingError.position(inputKeyWord.x, inputKeyWord.y+20);
 	}
 }
+
 function inputSentenceBox () {
 	Xstart = SqSize;
 	Ystart = 2.5*SqSize;
@@ -346,6 +372,7 @@ function inputSentenceBox () {
 
 function getSentece () {
 	UserStr = inputMessage.value();
+	UserStr= trim(UserStr);
 	processUserStr();
 }
 
@@ -367,6 +394,8 @@ function inputSentenceDropDownBox() {
   
   function SelectEvent() {
 	UserStr =  sel.value();
+	UserStr= trim(UserStr);
+	UserStr = UserStr.replace(/\s/g, ''); // remove all spaces in user guess string 
 	processUserStr();
   }
 
