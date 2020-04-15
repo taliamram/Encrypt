@@ -385,6 +385,10 @@ function inputSentenceDropDownBox() {
 	sel.option("The world is full of beautiful things including you");
 	sel.option("i'm on a seafood diet i see food and i eat it");
 	sel.option("My candle burns at both ends");
+	sel.option("אתה לא יכול לטפס על סולם ההצלחה עם הידיים בכיס");
+	sel.option("הגדרת המטרות היא הצעד הראשון בהפיכת הבלתי נראה לגלוי");
+	sel.option("שום דבר לא יעבוד אם אתה לא תעבוד");
+	sel.option("העבודה שלך הכי קלה, אתה בסך הכל צריך ללחוץ על כפתור");
 	sel.changed(SelectEvent);
   }
   
