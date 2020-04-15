@@ -55,10 +55,6 @@ function setup() {
   	noLoop();
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  SqSize = windowHeight/20;
-}
 
 function draw() {
 	if(state == 'DrawKeyword'){
