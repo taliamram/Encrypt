@@ -109,13 +109,27 @@ function draw() {
 				text("the message is: \n" + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
 				if(decryptStr.includes(UserStr) == true)
 				{
-					fill("green");
-					text("VERY GOOD !!! your guess was correct \n",windowWidth/2, windowHeight/2,SqSize); 
+					//fill("green");
+					//text("VERY GOOD !!! your guess was correct \n",windowWidth/2, windowHeight/2,SqSize); 
+					Swal.fire({
+					position: 'center',
+					icon: 'success',
+					title: 'VERY GOOD !!! your guess is correct',
+					showConfirmButton: false,
+					//timer: 1500
+				  	})
 				}
 				else
 				{
-					fill("red");
-					text(" :( bad guess \n",windowWidth/2, windowHeight/2,SqSize);
+					//fill("red");
+					//text(" :( bad guess \n",windowWidth/2, windowHeight/2,SqSize);
+					Swal.fire({
+						position: 'center',
+						icon: 'error',
+						title: ':( bad guess',
+						showConfirmButton: false,
+						//timer: 1500
+						  })
 				}
 
 			  	noLoop();
@@ -149,7 +163,15 @@ function decriptMessage (data) {
 		textSize(SqSize/2);
 		textAlign(LEFT);
 		greetingMessage.remove();
+		fill("black");
 		text("got encrypted message :" + data, Xstart, Ystart); // Text wraps within text box
+		Swal.fire({
+			position: 'center',
+			icon: 'info',
+			title: 'got encrypted message :' + data,
+			showConfirmButton: false,
+			timer: 2500
+			  })
 		StrIndex=0;
 		DrawIndex=0;
 		Xstart = SqSize;
@@ -342,12 +364,16 @@ function getKeyword () {
 			state= 'DrawKeyword';
 			loop();
 		}
+		else
+		Swal.fire({position: 'top',title: 'keyword length can be 3-7 characters'});
 		
 	}
 	else
 	{ 
-		greetingError = createElement('h2', 'keyword can be only A-Z a-z and 3-7 length');
-		greetingError.position(inputKeyWord.x, inputKeyWord.y+20);
+		Swal.fire({position: 'top',title: 'keyword can be only A-Z a-z and 3-7 characters length'});
+	
+		//greetingError = createElement('h2', 'keyword can be only A-Z a-z and 3-7 length');
+		//greetingError.position(inputKeyWord.x, inputKeyWord.y+20);
 	}
 }
 
