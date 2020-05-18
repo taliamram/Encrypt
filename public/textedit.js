@@ -1,46 +1,40 @@
+//רשימת משתנים גלובלים לשימוש בין הפונקציות השונות
+let UserStr = []; //המחרוזת שמחזיקה את המשפט שמיועד להצפנה/פענוח תלוי במצב במכונת המצבים
 
+let encryptStr = []; //המשפט לאחר ההצפנה
+let decryptStr = []; // המשפט לאחר הפענוח
+let sendStr = []; // המשפט המפוענח
+let colors = []; // מערך המחזיר צבעים- כל עמודה בעלת צבע אחד
+let SqSize; //מגדיר מהו גודל כל ריבוע ופיקסלים
+let StrIndex=0; // המצביע על המיקום הנוכחי במחרוזת
+let DrawIndex=0; // מצביע על המיקום הנוכחי בציור הטבלה
+let Xstart; //קורדינטה המציעה על קודקוד הציור בציר האיקס
+let Ystart; //yקורדינטה המציעה על קודקוד הציור בציר ה
+let row; //מציין את מספר השורה הנוכחית
+let column;//מציין את מספר העמודה הנוכחי
+let KeyLen; //מציין את אורך מילת המפתח
+let KeyWord;// = 'apple' מחזיק את מילת המפתח
+let orderOfletters; //מערך המחזיק את סדר מילת המפתח לפי הא-ב
+let state; //מחזיק את המצב הנוכחי של מכונת המצבים
+let recivedStr; //המחרוזת שהגיעה מהסוקט
+let columnLen; //אורך כל תור(מספר השורות)
+let buttonKeyWord; //מצביע על הכפתור שמשמש למילת המפתח
+let greetingKeyWord; //מצביע להודעה של הכנסת מילת מפתח
+let inputKeyWord; //מצביע לתיבת הקלט של מילת הקוד
+let buttonMessage; //מצביע כל כפתור המשמש לקליטת המשפט להצפנה
+let greetingMessage; //מצביע להודעה של הכנסת משפט להצפנה
+let greetingError; //לא בשימוש 
+let inputMessage; //מצביע לתיבת הקלט של המשפט 
+let sel; // מצביע על מאגר המשפטים
+let isreceiver; //דגל שמסמל אם התוכנית במצב של מצפין ההודעה או מפענח
 
-let UserStr = [];
-
-let encryptStr = [];
-let decryptStr = [];
-let sendStr = [];
-let colors = [];
-let maxDistance;
-let spacer;
-let SqSize;
-let StrIndex=0;
-let DrawIndex=0;
-let Xstart;
-let Ystart;
-let row;
-let column;
-let KeyLen;
-let KeyWord;// = 'apple';
-let orderOfletters;
-let displayInputBox;
-let inputCompleted;
-let state;
-let recivedStr;
-let columnLen;
-let  buttonKeyWord;
-let greetingKeyWord;
-let inputKeyWord;
-let buttonMessage;
-let greetingMessage;
-let greetingError;
-let inputMessage;
-let sel;
-let isreceiver;
-
-function setup() {
-	inputCompleted = false;
+function setup() { //נקרא פעם אחת בתחילת התוכנית על ידי p5JS
 	
-	createCanvas(window.innerWidth, window.innerHeight);//(windowWidth, windowHeight);
+	createCanvas(window.innerWidth, window.innerHeight);//(windowWidth, windowHeight); 
 	
-	socket = io.connect('http://127.0.0.1:3000');
-	socket.on('encriptedMessage',decriptMessage);
-	socket.on('KeyWord',updateKeyWord);
+	socket = io.connect('http://127.0.0.1:3000'); //פתיחת קשר עם השרת
+	socket.on('encriptedMessage',decriptMessage); //האזנה להודעות מהשרת
+	socket.on('KeyWord',updateKeyWord); //האזנה להודעות מהשרת
 	stroke(20);      
 	SqSize = windowHeight/20;
 	Xstart = SqSize;
@@ -50,36 +44,36 @@ function setup() {
    column=0;
    state = 'nostate';
    frameRate(14);
-   colors = ["red",  "yellow", "orange","Cyan","Purple","blue", "green","gray"];
-	inputKeywordBox();
+   colors = ["red",  "yellow", "orange","Cyan","Purple","blue", "green","gray"]; //קביעת הצבעים
+	inputKeywordBox(); //קפיצה לפעולה המטפלת בקלט מילת המפתח 
   	noLoop();
 }
 
 
-function draw() {
-	if(state == 'DrawKeyword'){
+function draw() { //נקרא על ידי p5Js כל פעם שהתוכנית במצה loop איקס פעמים בשנייה
+	if(state == 'DrawKeyword'){ //מצב של קבלת מילת מפתח
 		
-		if(StrIndex<KeyWord.length)
+		if(StrIndex<KeyWord.length) //מצייר את מילת המפתח 
 			drawKeyword (KeyWord);
-		else
+		else // סיים ועובר לשלב הבא
 		{
 			row=0;
 			column=0;
 			StrIndex=0;
-			sortKeyWord();
-			drawKeywordNum();
-			inputSentenceBox();
+			sortKeyWord(); //מיון לוגי של מילת המפתח
+			drawKeywordNum(); //הצגה גרפית של סדר הא-ב במשפט
+			inputSentenceBox(); //מעבר לפונקציה שתשנה למצב הבא
 			noLoop();
 		}
 	}
-	else if(state == 'encrypt'){
-		if(UserStr.length > 0){
+	else if(state == 'encrypt'){ //מצב של מצפין ההודעה
+		if(UserStr.length > 0){ //מציג את המשפט בתוך טבלת העמודות
 		if(StrIndex<UserStr.length)
 			drawOrigin(UserStr);
-		else
+		else //סיים להציג בטבלה ואם הטבלה לא התמלאה עד הסוף מוסיף x y z
 		{
 		
-		  if(column != KeyLen-1)
+		  if(column != KeyLen-1) 
 		  {
 		   // StrIndex = StrIndex-(KeyLen-column-1);
 		   let l = 'z'.charCodeAt(0) - (KeyLen-1-column);
@@ -88,26 +82,26 @@ function draw() {
 			   UserStr += String.fromCharCode(l+i+1);
 		   }
 		  }
-		  else
+		  else // סיים למלא את הטבלה במלואה ועובר להציג את המשפטים לפי אופן ההצפנה
 		  {
-		   	drawEncryptedOrdered();
+		   	drawEncryptedOrdered(); //מציג את המשפטים לפי הסדר הלוגי של העמודות -לב ההצפנה!
 		  	noLoop();
 		  }
 		}
 		}
 	}
-	else if(state == 'decrypt'){
-		if(recivedStr.length > 0){
+	else if(state == 'decrypt'){ //מצב מפענח
+		if(recivedStr.length > 0){ //מצייר את המשפט המוצפן בטבלת הפענוח לפי עמודות ולפי סדר הא-ב 
 			if(StrIndex<recivedStr.length)
 				drawDecrypt(recivedStr);
-			else
+			else//מפענח את המשפט המוצפן אחרי הצגתו בטבלה
 			{
 				decryptStr = decryptStr.join("");
 				textAlign(LEFT);
 				textSize(SqSize/2);
 				
-				text("the message is: \n" + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); 
-				if(decryptStr.includes(UserStr) == true)
+				text("the message is: \n" + decryptStr, SqSize, Ystart+(SqSize*(columnLen+2)),SqSize); //הצגת המשפט המקורי
+				if(decryptStr.includes(UserStr) == true) //התראה קופצת למשתמש אם המשפט שהוא הכניס הוא גם המשפט המקורי
 				{
 					//fill("green");
 					//text("VERY GOOD !!! your guess was correct \n",windowWidth/2, windowHeight/2,SqSize); 
@@ -119,7 +113,7 @@ function draw() {
 					//timer: 1500
 				  	})
 				}
-				else
+				else // התראה קופצת שמודיעה למשתמש שהוא טעה בפענוח
 				{
 					//fill("red");
 					//text(" :( bad guess \n",windowWidth/2, windowHeight/2,SqSize);
@@ -141,7 +135,7 @@ function draw() {
 	}
 }
  
-function updateKeyWord(data) {
+function updateKeyWord(data) { //לאחר קבלת הודעה מהשרת פעולה זו הופכת את המסך של המשתמש לורוד ומשנה את המצב במכונת המצבים למצב המציג את מילת המפתח שנקלטה
  	KeyWord = data;
 	KeyLen = KeyWord.length;
 	Xstart = SqSize;
@@ -152,20 +146,20 @@ function updateKeyWord(data) {
 	buttonKeyWord.hide();
 	greetingKeyWord.remove();
 	inputKeyWord.remove();
-	background("pink"); // Set the background to white
-	state = 'DrawKeyword';
-	loop();
+	background("pink"); // Set the background to pink
+	state = 'DrawKeyword'; // שינוי מצב לציור מילת הקוד
+	loop(); //קיראה לdraw
  } 
-function decriptMessage (data) {
+function decriptMessage (data) {//לאחר קבלת המשפט המוצפן מהשרת פונקציה זו מתריאה על קבלת הודעה ומשנה את הדגל למצב מקבל ההודעה
 		recivedStr = data;
 		Xstart = SqSize;
 		Ystart = SqSize*2;
 		textSize(SqSize/2);
 		textAlign(LEFT);
-		greetingMessage.remove();
+		greetingMessage.remove(); //מחיקת ההודעה לבקשת קלט מהמשתמש
 		fill("black");
 		text("got encrypted message :" + data, Xstart, Ystart); // Text wraps within text box
-		Swal.fire({
+		Swal.fire({ //התראה שקופצת ומבשרת על קבלת משפט ממשתמש אחד
 			position: 'center',
 			icon: 'info',
 			title: 'got encrypted message :' + data,
@@ -177,7 +171,7 @@ function decriptMessage (data) {
 		Xstart = SqSize;
 		Ystart = SqSize*4;
 		row=0;
-		isreceiver = true;
+		isreceiver = true; //שינוי הדגל למצב מקבל ההודעה ולא מצפין ההודעה
 		//buttonMessage.hide();
 		greetingMessage.remove();
 		//inputMessage.remove();
@@ -186,7 +180,7 @@ function decriptMessage (data) {
 		//loop();
 }
 		
-function drawKeyword (stringToDraw) {
+function drawKeyword (stringToDraw) { //מצייר לפי צבעים את מילת הקוד
 	column = DrawIndex%KeyLen;
 	 fill(colors[column]);	  
 	 rect(Xstart, Ystart, SqSize, SqSize);
@@ -194,7 +188,7 @@ function drawKeyword (stringToDraw) {
 	 textSize(SqSize);
 	 textAlign(CENTER, CENTER);
 	 let currChar = stringToDraw[StrIndex];
-	 if(currChar != ' ')
+	 if(currChar != ' ') //לא יקרה מצב שבו יהיה רווח כי עשיתי בדיקה כזו בהכנסת הקלט
 	 {
 	   text(currChar, Xstart, Ystart+(SqSize/2),SqSize); // Text wraps within text box
 	   StrIndex++;
@@ -203,11 +197,11 @@ function drawKeyword (stringToDraw) {
 	 }
 }
 	  
-function drawOrigin (stringToDraw) {
+function drawOrigin (stringToDraw) { //מצייר את המשפט המקורי בטבלה מסודרת לפי הא-ב של מילת המפתח 
 
 	 column = DrawIndex%KeyLen;
 	 
-	  fill(colors[column]);	  
+	  fill(colors[column]);	//צבעים  
 	  
 	  let currChar = stringToDraw[StrIndex];
 	  if(currChar != ' ')
@@ -235,7 +229,7 @@ function drawOrigin (stringToDraw) {
 }
 
 
-function drawDecrypt (stringToDraw) {
+function drawDecrypt (stringToDraw) { //מציג בטבלה בצורה גרפית לפי צבעים ולפי סדר התורים לפי הא-ב את הצפנת המשפט
 	
 	//column = DrawIndex%KeyLen;
 	columnLen = stringToDraw.length/KeyLen;
@@ -263,7 +257,7 @@ function drawDecrypt (stringToDraw) {
 	}
 }
 
-function drawEncryptedOrdered () {
+function drawEncryptedOrdered () { //מציג את המשפטים בשורות לפי הסדר הלוגי של העמודות -לב ההצפנה
 
 		//Ystart += SqSize;
 		let xx=0;
@@ -273,7 +267,7 @@ function drawEncryptedOrdered () {
 			encryptStr[orderOfletters[k]] = encryptStr[orderOfletters[k]].join("");
 			Ystart += SqSize/2;
 			textAlign(LEFT);
-			fill(colors[orderOfletters[k]]);	
+			fill(colors[orderOfletters[k]]); //צובע כל שורה בצבע המתאים להבנת ההצפנה	
 			text( encryptStr[orderOfletters[k]], Xstart, Ystart+(SqSize/2),SqSize);
 			for(let y=0 ; y < encryptStr[k].length ; y++)
 			{
@@ -293,12 +287,12 @@ function drawEncryptedOrdered () {
 		column=0;
 		drawKeywordNum();
 		isreceiver = false;
-		socket.emit('encriptedMessage',sendStr);
+		socket.emit('encriptedMessage',sendStr); //שולח את ההודעה המוצפנת על גבי הסוקט לשרת
 		noLoop();
 }
 
 
-function drawKeywordNum () {
+function drawKeywordNum () { //מציג על גבי מילת הקוד את סדר הא-ב להצפנה קלה יותר
 	column = DrawIndex%KeyLen;
 	Xstart = SqSize;
 	Ystart = SqSize-(SqSize/4);
@@ -312,7 +306,7 @@ function drawKeywordNum () {
 	}
 }
 
-function sortKeyWord () {
+function sortKeyWord () { //יצירת מערך שישמור את סדר הא-ב במילת המפתח
 	orderOfletters = new Array(KeyLen);
 	var k=0;
 	for(let i = 'A'.charCodeAt(0); i <= 'Z'.charCodeAt(0); i++){
@@ -329,19 +323,19 @@ function sortKeyWord () {
 	}
 }
 
-function inputKeywordBox () {	
-	inputKeyWord = createInput();
+function inputKeywordBox () { //יצירת כפתור ותיבת קלט למילת הקוד	
+	inputKeyWord = createInput(); //תיבת טקסט
 	inputKeyWord.size(60);
 	inputKeyWord.position(Xstart , Ystart);
-	buttonKeyWord = createButton('submit');
+	buttonKeyWord = createButton('submit'); //כפתור
   	buttonKeyWord.position(inputKeyWord.x + inputKeyWord.width, Ystart);
-  	greetingKeyWord = createElement('h2', 'Enter your keyword:');
+  	greetingKeyWord = createElement('h2', 'Enter your keyword:'); //הוראה למשתמש
   	greetingKeyWord.position(inputKeyWord.x, inputKeyWord.y-50);
-  	buttonKeyWord.mousePressed(getKeyword);
+  	buttonKeyWord.mousePressed(getKeyword); //כאשר יש לחיצה על הכפתור קריאה לפעולה הבאה
 }
 
-function getKeyword () {
-	if(greetingError)
+function getKeyword () { //לאחר קבלת קלט של מילת קוד הפעולה עוברת למצב הראשון במכונת המצבים, שולחת את מילת הקלט לשאר המשתמשים ומשנה את צבע המסך של השולח לירוק
+	if(greetingError) //לא בשימוש
     	greetingError.remove();	
 	KeyWord = inputKeyWord.value();
 	KeyWord = trim(KeyWord); // remove space from begining and end of string
@@ -349,26 +343,26 @@ function getKeyword () {
 	KeyLen = KeyWord.length;
 	if(KeyWord.match("^[a-zA-Z]*$")) // make sure that oly alpha beit is inserted 
 	{
-		if(KeyLen > 2 && KeyLen <=7 )
+		if(KeyLen > 2 && KeyLen <=7 ) //תנאי המכריח את מילת הקלט להיות בין2 ל7 תווים
 		{
 			buttonKeyWord.hide();
 			greetingKeyWord.remove();
 			inputKeyWord.remove();
-			socket.emit('KeyWord',KeyWord);
+			socket.emit('KeyWord',KeyWord); //שליחת מילת המפתח לשאר המשתמשים דרך השרת
 			Xstart = SqSize;
 			Ystart = SqSize-(SqSize/4);
 			row=0;
 			column=0;
 			StrIndex=0;
-			background("Green"); // Set the background to 
-			state= 'DrawKeyword';
+			background("Green"); // Set the background to green
+			state= 'DrawKeyword'; //המצב הראשון במכונת מצבים-מצב הצגת מילת הקלט
 			loop();
 		}
-		else
-		Swal.fire({position: 'top',title: 'keyword length can be 3-7 characters'});
+		else //כאשר התנאי לא מתקיים קופצת התראה למשתמש שהקלט אינו תקין עם הסבר מהו קלט תקין
+		Swal.fire({position: 'top',title: 'keyword length can be 3-7 characters'}); 
 		
 	}
-	else
+	else //התראה למשתמש על קלט אינו תקין והסבר מהו קלט תקין
 	{ 
 		Swal.fire({position: 'top',title: 'keyword can be only A-Z a-z and 3-7 characters length'});
 	
@@ -377,29 +371,29 @@ function getKeyword () {
 	}
 }
 
-function inputSentenceBox () {
+function inputSentenceBox () { //יצירת תיבת טקסט להכנסת משפט להצפנה וכפתור 
 	Xstart = SqSize;
 	Ystart = 2.5*SqSize;
-	inputMessage = createInput();
+	inputMessage = createInput(); //יצירת תיבת קלט
 	inputMessage.size(300);
 	inputMessage.position(Xstart , Ystart);
 	inputMessage.size = 400;
- 	buttonMessage = createButton('submit');
+ 	buttonMessage = createButton('submit'); //יצירת כפתור
 	buttonMessage.position(inputMessage.x + inputMessage.width, inputMessage.y);
 	greetingMessage = createElement('h2', 'enter sentence to encrypt');
 	greetingMessage.position(inputMessage.x, inputMessage.y-50);
-	buttonMessage.mousePressed(getSentece);
-	inputSentenceDropDownBox();
+	buttonMessage.mousePressed(getSentece); //אם לוחצים על הכפתור אחרי הכנסת משפט בתיבת הקלט עובר לפעולה הבאה
+	inputSentenceDropDownBox(); // אם המשתמש לא לוחץ על הכפתור ובוחר משפט ממאגר המשפטים עובר לפעולה הבאה
 }
 
-function getSentece () {
+function getSentece () { //טיפול במשפט מתיבת הקלט או של המצפין או של המפענח תלוי במצב במכונת המצבים
 	UserStr = inputMessage.value();
-	UserStr= trim(UserStr);
-	processUserStr();
+	UserStr= trim(UserStr);// מחיקת רווחים מתחילת המשפט ומסופו
+	processUserStr(); //טיפול בקלט המשתמש
 }
 
 
-function inputSentenceDropDownBox() {
+function inputSentenceDropDownBox() { //יצירת אפשרות בחירת משפט ממאגר משפטים או של המצפין או של המפענח תלוי במצב במכונת המצבים
 	textAlign(CENTER);
 	Xstart = SqSize;
 	sel = createSelect();
@@ -415,17 +409,17 @@ function inputSentenceDropDownBox() {
 	sel.option("הגדרת המטרות היא הצעד הראשון בהפיכת הבלתי נראה לגלוי");
 	sel.option("שום דבר לא יעבוד אם אתה לא תעבוד");
 	sel.option("העבודה שלך הכי קלה, אתה בסך הכל צריך ללחוץ על כפתור");
-	sel.changed(SelectEvent);
+	sel.changed(SelectEvent); //כאשר נבחר משפט מהמאגר
   }
   
-  function SelectEvent() {
-	UserStr =  sel.value();
+  function SelectEvent() { // כאשר נבחר משפט ממכונת המצבים
+	UserStr =  sel.value(); //הכנסת המשפט למשתנה המתאים
 	
-	processUserStr();
+	processUserStr();//טיפול בקלט המשתמש
   }
 
-  function processUserStr() {
-  if(isreceiver == false)  
+  function processUserStr() { //עושה שני תפקידים- תלוי אם המשתמש הוא שולח ההודעה או מקבל ההודעה
+  if(isreceiver == false)  //דגל=שולח ההודעה, משנה את מכונת המצבים למצב מצפין ויוצר מערך דו מימדי ריק 
   {
 	if(UserStr.length > 2)
 	{
@@ -437,15 +431,15 @@ function inputSentenceDropDownBox() {
 				encryptStr[x][y] = "";
 		}
 		Ystart = 3.5*SqSize;
-		state= 'encrypt';
+		state= 'encrypt'; //מצב מצפין
 		loop();
 	}
   }
-  else
+  else //דגל= מקבל ההודעה, משנה את מכונת המצבים למצב מפענח ומוחק מהמשפט שהתקבל את הרווחים
   {
 	  UserStr= trim(UserStr);
 	  UserStr = UserStr.replace(/\s/g, ''); // remove all spaces in user guess string 
-	  state = 'decrypt';
+	  state = 'decrypt'; //מצב מפענח
 	  loop();
   }
 }
